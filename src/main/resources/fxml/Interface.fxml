@@ -22,7 +22,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="600.0" prefWidth="800.0" type="BorderPane" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.rodolfo.ferramenta.segmentacao.controllers.InterfaceController">
+<fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="600.0" prefWidth="900.0" type="BorderPane" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.rodolfo.ferramenta.segmentacao.controllers.InterfaceController">
    <center>
       <ScrollPane fx:id="scrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
          <content>
@@ -79,8 +79,8 @@
             </MenuBar>
             <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
                <children>
-                  <Label fx:id="txtCampoDiretorio" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Diretório:" HBox.hgrow="ALWAYS" />
-                  <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="C:usuo/rodolfo/imagem" HBox.hgrow="ALWAYS" />
+                  <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Diretório:" HBox.hgrow="ALWAYS" />
+                  <TextField fx:id="txtCampoDiretorio" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="C:usuo/rodolfo/imagem" HBox.hgrow="ALWAYS" />
                </children>
                <GridPane.margin>
                   <Insets left="5.0" />
