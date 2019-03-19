@@ -13,11 +13,6 @@ public class MainApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         
-        BorderPane root = FXMLLoader.load(getClass().getResource("/fxml/Interface.fxml"));
-        
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add("/styles/Styles.css");
-        
         stage.setTitle("Segmentação Semiautomática");
         stage.setMinWidth(900);
         stage.setMinHeight(600);
@@ -27,6 +22,12 @@ public class MainApp extends Application {
             Platform.exit();
             System.exit(0);
         });
+
+
+        BorderPane root = FXMLLoader.load(getClass().getResource("/fxml/Interface.fxml"));
+        
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add("/styles/Styles.css");
 
         stage.setScene(scene);
         stage.show();

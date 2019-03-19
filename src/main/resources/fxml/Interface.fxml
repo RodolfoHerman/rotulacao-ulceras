@@ -22,7 +22,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="600.0" prefWidth="900.0" type="BorderPane" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.rodolfo.ferramenta.segmentacao.controllers.InterfaceController">
+<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.rodolfo.ferramenta.segmentacao.controllers.InterfaceController">
    <center>
       <ScrollPane fx:id="scrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
          <content>
@@ -32,7 +32,7 @@
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor></Canvas>
-                  <Canvas fx:id="canvasFG" height="200.0" onMouseDragged="#onMouseDrggd" onMousePressed="#onMousePressed" onMouseReleased="#onMouseReleased" width="200.0">
+                  <Canvas fx:id="canvasFG" height="200.0" onMouseDragged="#onMouseDragged" onMousePressed="#onMousePressed" onMouseReleased="#onMouseReleased" width="200.0">
                      <cursor>
                         <Cursor fx:constant="CROSSHAIR" />
                      </cursor></Canvas>
@@ -117,15 +117,15 @@
                               <Cursor fx:constant="HAND" />
                            </cursor>
                            <toggleGroup>
-                              <ToggleGroup fx:id="rotulacao" />
+                              <ToggleGroup fx:id="rotulacaoGrupoRadio" />
                            </toggleGroup>
                         </RadioButton>
-                        <RadioButton fx:id="radioEsfacelo" mnemonicParsing="false" styleClass="fonte" stylesheets="@../styles/Styles.css" text="Esfacelo" toggleGroup="$rotulacao">
+                        <RadioButton fx:id="radioEsfacelo" mnemonicParsing="false" styleClass="fonte" stylesheets="@../styles/Styles.css" text="Esfacelo" toggleGroup="$rotulacaoGrupoRadio">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </RadioButton>
-                        <RadioButton fx:id="radioEscara" mnemonicParsing="false" styleClass="fonte" stylesheets="@../styles/Styles.css" text="Escara" toggleGroup="$rotulacao">
+                        <RadioButton fx:id="radioEscara" mnemonicParsing="false" styleClass="fonte" stylesheets="@../styles/Styles.css" text="Escara" toggleGroup="$rotulacaoGrupoRadio">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
@@ -151,4 +151,4 @@
          </children>
       </GridPane>
    </right>
-</fx:root>
+</BorderPane>

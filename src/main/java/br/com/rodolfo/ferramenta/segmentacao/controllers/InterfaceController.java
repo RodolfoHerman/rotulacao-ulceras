@@ -13,14 +13,15 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.Pane;
 
 public class InterfaceController implements Initializable {
     
     @FXML
-    private ScrollPane scrollpane;
+    private ScrollPane scrollPane;
 
     @FXML
-    private Canvas paneCanvas;
+    private Pane paneCanvas;
 
     @FXML
     private Canvas canvasFG;
@@ -54,13 +55,32 @@ public class InterfaceController implements Initializable {
 
     
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }
-
-    
+    public void initialize(URL url, ResourceBundle rb) { }
 
 
+    @FXML
+    public void btnProcessarAction() {}
+
+    @FXML
+    public void onMouseDragged() {}
+
+    @FXML
+    public void onMousePressed() {}
+
+    @FXML
+    public void onMouseReleased() {}
+
+    @FXML
+    public void abrirImagemAction() {}
+
+    @FXML
+    public void salvarProgressoAction() {}
+
+    @FXML
+    public void fecharProgramaAction() {}
+
+    @FXML
+    public void sobreProgramaAction() {}
 
 
 
