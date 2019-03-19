@@ -1,14 +1,154 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane id="AnchorPane" prefHeight="200" prefWidth="320" xmlns:fx="http://javafx.com/fxml" fx:controller="br.com.rodolfo.ferramenta.segmentacao.controllers.InterfaceController">
-    <children>
-        <Button layoutX="126" layoutY="90" text="Click Me!" onAction="#handleButtonAction" fx:id="button" />
-        <Label layoutX="126" layoutY="120" minHeight="16" minWidth="69" fx:id="label" />
-    </children>
-</AnchorPane>
+<fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="600.0" prefWidth="800.0" type="BorderPane" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.rodolfo.ferramenta.segmentacao.controllers.InterfaceController">
+   <center>
+      <ScrollPane fx:id="scrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+         <content>
+            <Pane fx:id="paneCanvas" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
+               <children>
+                  <Canvas fx:id="canvasBG" height="200.0" width="200.0">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor></Canvas>
+                  <Canvas fx:id="canvasFG" height="200.0" onMouseDragged="#onMouseDrggd" onMousePressed="#onMousePressed" onMouseReleased="#onMouseReleased" width="200.0">
+                     <cursor>
+                        <Cursor fx:constant="CROSSHAIR" />
+                     </cursor></Canvas>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="DEFAULT" />
+               </cursor>
+            </Pane>
+         </content>
+      </ScrollPane>
+   </center>
+   <bottom>
+      <HBox alignment="BOTTOM_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" BorderPane.alignment="CENTER">
+         <children>
+            <ProgressBar fx:id="barraProgresso" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" progress="0.0" HBox.hgrow="ALWAYS" />
+         </children>
+      </HBox>
+   </bottom>
+   <top>
+      <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="38.0" prefWidth="800.0" styleClass="fonte" stylesheets="@../styles/Styles.css" BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="617.0" minWidth="10.0" percentWidth="70.0" prefWidth="539.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="261.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <MenuBar>
+              <menus>
+                <Menu fx:id="btnMenuArquivo" mnemonicParsing="false" text="Arquivo">
+                  <items>
+                        <MenuItem mnemonicParsing="false" onAction="#abrirImagemAction" text="Abrir imagem" />
+                        <MenuItem mnemonicParsing="false" onAction="#salvarProgressoAction" text="Salvar progresso" />
+                    <MenuItem mnemonicParsing="false" onAction="#fecharProgramaAction" text="Fechar programa" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Informações">
+                  <items>
+                    <MenuItem mnemonicParsing="false" onAction="#sobreProgramaAction" text="Sobre programa" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
+            <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+               <children>
+                  <Label fx:id="txtCampoDiretorio" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Diretório:" HBox.hgrow="ALWAYS" />
+                  <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="C:usuo/rodolfo/imagem" HBox.hgrow="ALWAYS" />
+               </children>
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </HBox>
+         </children>
+      </GridPane>
+   </top>
+   <right>
+      <GridPane minWidth="180.0" BorderPane.alignment="TOP_LEFT">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" percentHeight="80.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+               <children>
+                  <Label stylesheets="@../styles/Styles.css" text="Rotulação">
+                     <VBox.margin>
+                        <Insets top="30.0" />
+                     </VBox.margin>
+                     <styleClass>
+                        <String fx:value="fonte" />
+                        <String fx:value="sublinhado" />
+                     </styleClass>
+                  </Label>
+                  <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="30.0">
+                     <children>
+                        <RadioButton fx:id="radioGranulacao" mnemonicParsing="false" styleClass="fonte" stylesheets="@../styles/Styles.css" text="Granulação">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                           <toggleGroup>
+                              <ToggleGroup fx:id="rotulacao" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="radioEsfacelo" mnemonicParsing="false" styleClass="fonte" stylesheets="@../styles/Styles.css" text="Esfacelo" toggleGroup="$rotulacao">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </RadioButton>
+                        <RadioButton fx:id="radioEscara" mnemonicParsing="false" styleClass="fonte" stylesheets="@../styles/Styles.css" text="Escara" toggleGroup="$rotulacao">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </RadioButton>
+                     </children>
+                     <padding>
+                        <Insets top="10.0" />
+                     </padding>
+                     <VBox.margin>
+                        <Insets left="10.0" />
+                     </VBox.margin>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets top="50.0" />
+               </padding>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="1">
+               <children>
+                  <Button fx:id="btnProcessar" mnemonicParsing="false" onAction="#btnProcessarAction" styleClass="fonte" stylesheets="@../styles/Styles.css" text="Processar" />
+               </children>
+            </VBox>
+         </children>
+      </GridPane>
+   </right>
+</fx:root>

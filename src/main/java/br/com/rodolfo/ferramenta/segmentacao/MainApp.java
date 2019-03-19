@@ -1,9 +1,10 @@
 package br.com.rodolfo.ferramenta.segmentacao;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 
@@ -11,12 +12,22 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/Interface.fxml"));
+        
+        BorderPane root = FXMLLoader.load(getClass().getResource("/fxml/Interface.fxml"));
         
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/Styles.css");
         
-        stage.setTitle("JavaFX and Maven");
+        stage.setTitle("Segmentação Semiautomática");
+        stage.setMinWidth(900);
+        stage.setMinHeight(600);
+        stage.centerOnScreen();
+        stage.setMaximized(true);
+        stage.setOnCloseRequest(WindowEvent -> {
+            Platform.exit();
+            System.exit(0);
+        });
+
         stage.setScene(scene);
         stage.show();
     }

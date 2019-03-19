@@ -1,3 +1,24 @@
-.button {
+.fonte {
     -fx-font-weight: bold;
+    -fx-font-size: 12pt;
 }
+
+.sublinhado {
+    -fx-underline: true;
+}
+
+.button {
+    -fx-padding: 15pt;
+    -fx-background-color: cornflowerblue;
+}
+
+.button:hover {
+    -fx-background-color: lightskyblue;
+    -fx-cursor: hand;
+}
+
+.button:pressed {
+    -fx-background-insets: 2 0 0 0,2 0 3 0, 2 0 4 0, 2 0 5 0;
+    -fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.8) , 0, 0.0 , 0 , 1);
+}
+
