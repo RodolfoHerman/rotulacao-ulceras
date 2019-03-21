@@ -1,9 +1,10 @@
 package br.com.rodolfo.ferramenta.segmentacao.services;
 
-import org.bytedeco.javacpp.opencv_core.Mat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import br.com.rodolfo.ferramenta.segmentacao.models.Imagem;
+import br.com.rodolfo.ferramenta.segmentacao.utils.Metodos;
 import br.com.rodolfo.ferramenta.segmentacao.utils.opencv.ImagemOpenCV;
 
 /**
@@ -19,10 +20,15 @@ public class ImagemService {
      * @param caminho
      * @return img
      */
-    public Mat abrirImagem(String caminho) {
+    public Imagem abrirImagem(String caminho) {
         
         log.info("Abrindo imagem no caminho : {}", caminho);
-        return ImagemOpenCV.abrir(caminho);
+
+        Imagem imagem = new Imagem();
+        imagem.setImagemOpenCV(ImagemOpenCV.abrir(caminho));
+        imagem.setNome(Metodos.extrairNomeArquivo(caminho));
+
+        return imagem;
     }
 
     /**
@@ -33,10 +39,15 @@ public class ImagemService {
      * @param caminho
      * @return img
      */
-    public Mat abrirImagem(int largura, int altura, String caminho) {
+    public Imagem abrirImagem(int largura, int altura, String caminho) {
         
         log.info("Abrindo imagem no caminho : {}", caminho);
-        return ImagemOpenCV.amostrar(altura, largura, ImagemOpenCV.abrir(caminho));
+
+        Imagem imagem = new Imagem();
+        imagem.setImagemOpenCV(ImagemOpenCV.amostrar(altura, largura, ImagemOpenCV.abrir(caminho)));
+        imagem.setNome(Metodos.extrairNomeArquivo(caminho));
+
+        return imagem;
     }
     
 }
