@@ -1,13 +1,13 @@
 package br.com.rodolfo.ferramenta.segmentacao.utils.opencv;
 
 /**
- * Operacao
+ * EstruturaOpenCV
  */
-public class Operacao {
+public class EstruturaOpenCV {
 
     /**
      * Não permitir instânciação da classe
      */
-    private Operacao() {}
+    private EstruturaOpenCV() {}
     
 }

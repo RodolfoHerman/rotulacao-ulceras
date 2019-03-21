@@ -13,14 +13,14 @@ import org.bytedeco.javacpp.indexer.IntRawIndexer;
 import org.bytedeco.javacpp.indexer.UByteRawIndexer;
 
 /**
- * Imagem
+ * ImagemOpenCV
  */
-public class Imagem {
+public class ImagemOpenCV {
 
     /**
      * Não permitir instânciação da classe
      */
-    private Imagem() {}
+    private ImagemOpenCV() {}
     
     /**
      * Abrir uma imagem.

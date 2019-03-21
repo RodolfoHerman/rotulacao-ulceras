@@ -4,7 +4,7 @@ import org.bytedeco.javacpp.opencv_core.Mat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import br.com.rodolfo.ferramenta.segmentacao.utils.opencv.Imagem;
+import br.com.rodolfo.ferramenta.segmentacao.utils.opencv.ImagemOpenCV;
 
 /**
  * ImagemService
@@ -22,7 +22,7 @@ public class ImagemService {
     public Mat abrirImagem(String caminho) {
         
         log.info("Abrindo imagem no caminho : {}", caminho);
-        return Imagem.abrir(caminho);
+        return ImagemOpenCV.abrir(caminho);
     }
 
     /**
@@ -36,7 +36,7 @@ public class ImagemService {
     public Mat abrirImagem(int largura, int altura, String caminho) {
         
         log.info("Abrindo imagem no caminho : {}", caminho);
-        return Imagem.amostrar(altura, largura, Imagem.abrir(caminho));
+        return ImagemOpenCV.amostrar(altura, largura, ImagemOpenCV.abrir(caminho));
     }
     
 }
