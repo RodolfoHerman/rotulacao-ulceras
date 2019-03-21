@@ -5,7 +5,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import org.bytedeco.javacpp.opencv_imgcodecs;
+import org.bytedeco.javacpp.opencv_imgproc;
 import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.Size;
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
 import org.bytedeco.javacpp.indexer.IntRawIndexer;
 import org.bytedeco.javacpp.indexer.UByteRawIndexer;
@@ -24,6 +26,7 @@ public class Imagem {
      * Abrir uma imagem.
      * 
      * @param caminho
+     * @return img
      */
     public static Mat abrir(String caminho) {
         
@@ -99,6 +102,7 @@ public class Imagem {
      * Realizar o dump da imagem Mat do tipo Byte
      * 
      * @param img
+     * @return dados
      */
     private static String dump_byte(Mat img) {
         
@@ -123,6 +127,7 @@ public class Imagem {
      * Realizar o dump da imagem Mat do tipo Integer
      * 
      * @param img
+     * @return dados
      */
     private static String dump_integer(Mat img) {
         
@@ -147,6 +152,7 @@ public class Imagem {
      * Realizar o dump da imagem Mat do tipo Float
      * 
      * @param img
+     * @return dados
      */
     private static String dump_float(Mat img) {
         
@@ -165,6 +171,22 @@ public class Imagem {
         indice.release();
 
         return dados.toString();
+    }
+
+    /**
+     * Amostra a imagem utilizando a interpolação Bicubica
+     * 
+     * @param altura
+     * @param largura
+     * @param img
+     * @return img
+     */
+    public static Mat amostrar(int altura, int largura, Mat img) {
+        
+        Mat dst = new Mat();
+        opencv_imgproc.resize(img, dst, new Size(largura, altura), 0, 0, opencv_imgproc.INTER_CUBIC);
+
+        return dst;
     }
 
 }
