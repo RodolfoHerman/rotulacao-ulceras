@@ -1,9 +1,12 @@
 package br.com.rodolfo.ferramenta.segmentacao.controllers;
 
+import java.awt.Point;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import br.com.rodolfo.ferramenta.segmentacao.MainApp;
 import br.com.rodolfo.ferramenta.segmentacao.models.Imagem;
@@ -22,7 +25,9 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 
 public class InterfaceController implements Initializable {
@@ -65,11 +70,17 @@ public class InterfaceController implements Initializable {
 
 
     // Variáveis não FX
+    private ScrollController scrollController;
     private FileChooser fileChooser;
     private String caminho;
     private ImagemService imagemService = new ImagemService();
     private Imagem imagem;
     private GraphicsContext graphicCanvasFG, graphicCanvasBG;
+    private Point mousePressionado;
+    private int mousePressionadoPrevX;
+    private int mousePressionadoPrevY;
+    private Set<Point> pontosDesenhados;
+    private final Color cor = Color.rgb(255, 80, 75);
 
     
     @Override
@@ -77,19 +88,53 @@ public class InterfaceController implements Initializable {
 
         graphicCanvasFG = canvasFG.getGraphicsContext2D();
         graphicCanvasBG = canvasBG.getGraphicsContext2D();
+
+        pontosDesenhados = new HashSet<>();
     }
 
     @FXML
     public void btnProcessarAction() {}
 
     @FXML
-    public void onMouseDragged() {}
+    public void onMouseDragged(MouseEvent event) {
+
+        scrollController.realizarEventoScroll(event);
+        
+        int x = Double.valueOf(event.getX()).intValue();
+        int y = Double.valueOf(event.getY()).intValue();
+
+        graphicCanvasFG.strokeLine(mousePressionadoPrevX, mousePressionadoPrevY, x, y);
+
+        // x = col
+        // y = row
+        mousePressionadoPrevX = x;
+        mousePressionadoPrevY = y;
+
+        pontosDesenhados.add(new Point(x,y));
+    }
 
     @FXML
-    public void onMousePressed() {}
+    public void onMousePressed(MouseEvent event) {
+
+        scrollController.stopScroll();
+        
+        int x = Double.valueOf(event.getX()).intValue();
+        int y = Double.valueOf(event.getY()).intValue();
+
+        mousePressionadoPrevX = x;
+        mousePressionadoPrevY = y;
+
+        mousePressionado = new Point(x,y);
+
+        pontosDesenhados.add(mousePressionado);
+    }
 
     @FXML
-    public void onMouseReleased() {}
+    public void onMouseReleased() {
+
+        scrollController.stopScroll();
+
+    }
 
     @FXML
     public void abrirImagemAction() {
@@ -101,9 +146,12 @@ public class InterfaceController implements Initializable {
 
             caminho = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf("\\"));
             txtCampoDiretorio.setText(file.getAbsolutePath());
-            imagem = imagemService.abrirImagem(1024, 1024, file.getAbsolutePath());
+            imagem = imagemService.abrirImagem(2048, 2048, file.getAbsolutePath());
 
+            resetar();
             inicializarCanvas(imagem.getImagemBytes());
+            
+            scrollController = new ScrollController(scrollPane, paneCanvas);
         }
     }
 
@@ -147,6 +195,7 @@ public class InterfaceController implements Initializable {
         canvasFG.setWidth(imagem.getCols());
         canvasFG.setHeight(imagem.getRows());
         graphicCanvasFG.setLineWidth(2.0);
+        graphicCanvasFG.setStroke(cor);
 
         canvasBG.setWidth(imagem.getCols());
         canvasBG.setHeight(imagem.getRows());
@@ -154,6 +203,13 @@ public class InterfaceController implements Initializable {
         graphicCanvasBG.drawImage(image, 0, 0);
 
         canvasFG.toFront();
+    }
+
+    private void resetar() {
+
+        pontosDesenhados.clear();
+        scrollPane.setVvalue(0);
+        scrollPane.setHvalue(0);
     }
 
 }
