@@ -80,7 +80,7 @@
             <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
                <children>
                   <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Diretório:" HBox.hgrow="ALWAYS" />
-                  <TextField fx:id="txtCampoDiretorio" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="C:usuo/rodolfo/imagem" HBox.hgrow="ALWAYS" />
+                  <TextField fx:id="txtCampoDiretorio" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
                </children>
                <GridPane.margin>
                   <Insets left="5.0" />

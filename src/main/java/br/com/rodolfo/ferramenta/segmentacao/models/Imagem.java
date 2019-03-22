@@ -1,6 +1,10 @@
 package br.com.rodolfo.ferramenta.segmentacao.models;
 
+import java.io.ByteArrayInputStream;
+
 import org.bytedeco.javacpp.opencv_core.Mat;
+
+import br.com.rodolfo.ferramenta.segmentacao.utils.opencv.ImagemOpenCV;
 
 /**
  * Imagem
@@ -8,9 +12,12 @@ import org.bytedeco.javacpp.opencv_core.Mat;
 public class Imagem {
 
     private String nome;
-    private Mat imagemOpenCV;
+    final private Mat imagem;
 
-    public Imagem() {}
+    public Imagem(Mat imagem) {
+
+        this.imagem = imagem;
+    }
 
 
     public String getNome() {
@@ -21,20 +28,21 @@ public class Imagem {
         this.nome = nome;
     }
 
-    public Mat getImagemOpenCV() {
-        return this.imagemOpenCV;
-    }
-
-    public void setImagemOpenCV(Mat imagemOpenCV) {
-        this.imagemOpenCV = imagemOpenCV;
+    public Mat getImagem() {
+        return this.imagem;
     }
 
     public int getRows() {
-        return this.imagemOpenCV.rows();
+        return this.imagem.rows();
     }
 
     public int getCols() {
-        return this.imagemOpenCV.cols();
+        return this.imagem.cols();
+    }
+
+    public ByteArrayInputStream getImagemBytes() {
+
+        return ImagemOpenCV.matParaByteImputStream(this.imagem);
     }
     
 }

@@ -1,5 +1,7 @@
 package br.com.rodolfo.ferramenta.segmentacao;
 
+import java.io.IOException;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -10,27 +12,36 @@ import javafx.stage.Stage;
 
 public class MainApp extends Application {
 
+    public static Stage mainStage;
+    private static BorderPane mainPane;
+    
     @Override
-    public void start(Stage stage) throws Exception {
-        
-        stage.setTitle("Segmentação Semiautomática");
-        stage.setMinWidth(900);
-        stage.setMinHeight(600);
-        stage.centerOnScreen();
-        stage.setMaximized(true);
-        stage.setOnCloseRequest(WindowEvent -> {
+    public void start(final Stage stage) throws Exception {
+
+        mainStage = stage;
+
+        mainStage.setTitle("Segmentação Semiautomática");
+        mainStage.setMinWidth(900);
+        mainStage.setMinHeight(600);
+        mainStage.centerOnScreen();
+        mainStage.setMaximized(true);
+        mainStage.setOnCloseRequest(WindowEvent -> {
             Platform.exit();
             System.exit(0);
         });
 
 
-        BorderPane root = FXMLLoader.load(getClass().getResource("/fxml/Interface.fxml"));
-        
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add("/styles/Styles.css");
+        mostrarScenePrincipal();
+    }
 
-        stage.setScene(scene);
-        stage.show();
+    public void mostrarScenePrincipal () throws IOException {
+
+        mainPane = FXMLLoader.load(getClass().getResource("/fxml/Interface.fxml"));
+        
+        Scene scene = new Scene (mainPane);
+        scene.getStylesheets().add("/styles/Styles.css");
+        mainStage.setScene(scene);
+        mainStage.show();
     }
 
     /**

@@ -1,5 +1,7 @@
 package br.com.rodolfo.ferramenta.segmentacao.utils.opencv;
 
+import java.io.ByteArrayInputStream;
+
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -40,21 +42,21 @@ public class ImagemOpenCV {
      */
     public static void mostrar(Mat img) {
         
-        JOptionPane.showMessageDialog(null, new JLabel(matParaImageIcon(img)));
+        JOptionPane.showMessageDialog(null, new JLabel(new ImageIcon(matParaByteImputStream(img).readAllBytes())));
     }
 
     /**
-     * Transforma uma Mat para ImageIcon
+     * Transforma imagem Mat para array de bytes
      * 
      * @param img
-     * @return ImageIcon
+     * @return bytes
      */
-    private static ImageIcon matParaImageIcon(Mat img) {
+    public static ByteArrayInputStream matParaByteImputStream(Mat img) {
 
         byte[] buf = new byte[(int)img.elemSize() * img.cols() * img.rows()];
         opencv_imgcodecs.imencode(".jpg", img, buf);
 
-        return new ImageIcon(buf);
+        return new ByteArrayInputStream(buf);
     }
 
     /**

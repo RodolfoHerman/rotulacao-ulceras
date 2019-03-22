@@ -24,8 +24,7 @@ public class ImagemService {
         
         log.info("Abrindo imagem no caminho : {}", caminho);
 
-        Imagem imagem = new Imagem();
-        imagem.setImagemOpenCV(ImagemOpenCV.abrir(caminho));
+        Imagem imagem = new Imagem(ImagemOpenCV.abrir(caminho));
         imagem.setNome(Metodos.extrairNomeArquivo(caminho));
 
         return imagem;
@@ -43,8 +42,7 @@ public class ImagemService {
         
         log.info("Abrindo imagem no caminho : {}", caminho);
 
-        Imagem imagem = new Imagem();
-        imagem.setImagemOpenCV(ImagemOpenCV.amostrar(altura, largura, ImagemOpenCV.abrir(caminho)));
+        Imagem imagem = new Imagem(ImagemOpenCV.amostrar(altura, largura, ImagemOpenCV.abrir(caminho)));
         imagem.setNome(Metodos.extrairNomeArquivo(caminho));
 
         return imagem;
