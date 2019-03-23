@@ -62,16 +62,8 @@ public class ScrollController {
         scrollTimeVertical.setCycleCount(Timeline.INDEFINITE);
         scrollTimeHorizontal.setCycleCount(Timeline.INDEFINITE);
 
-        scrollTimeVertical.getKeyFrames().add(new KeyFrame(Duration.millis(8), 
-                                                               "Scroll", 
-                                                               ActionEvent ->  
-                dragScrollVertical()));
-        
-        scrollTimeHorizontal.getKeyFrames().add(new KeyFrame(Duration.millis(4), 
-                                                               "Scroll", 
-                                                               ActionEvent -> 
-                dragScrollHorizontal()));        
-        
+        scrollTimeVertical.getKeyFrames().add(new KeyFrame(Duration.millis(8), "Scroll", ActionEvent -> dragScrollVertical()));
+        scrollTimeHorizontal.getKeyFrames().add(new KeyFrame(Duration.millis(4), "Scroll", ActionEvent -> dragScrollHorizontal()));
     }
 
     public void stopScroll() {

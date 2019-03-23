@@ -7,12 +7,13 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import br.com.rodolfo.ferramenta.segmentacao.MainApp;
 import br.com.rodolfo.ferramenta.segmentacao.models.Imagem;
+import br.com.rodolfo.ferramenta.segmentacao.process.TrabalhadoraSegmentacao;
 import br.com.rodolfo.ferramenta.segmentacao.services.ImagemService;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -31,7 +32,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 
 public class InterfaceController implements Initializable {
-    
+
     @FXML
     private ScrollPane scrollPane;
 
@@ -40,7 +41,7 @@ public class InterfaceController implements Initializable {
 
     @FXML
     private Canvas canvasFG;
-    
+
     @FXML
     private Canvas canvasBG;
 
@@ -68,7 +69,6 @@ public class InterfaceController implements Initializable {
     @FXML
     private RadioButton radioEscara;
 
-
     // Variáveis não FX
     private ScrollController scrollController;
     private FileChooser fileChooser;
@@ -82,9 +82,8 @@ public class InterfaceController implements Initializable {
     private Set<Point> pontosDesenhados;
     private final Color cor = Color.rgb(255, 80, 75);
 
-    
     @Override
-    public void initialize(URL url, ResourceBundle rb) { 
+    public void initialize(URL url, ResourceBundle rb) {
 
         graphicCanvasFG = canvasFG.getGraphicsContext2D();
         graphicCanvasBG = canvasBG.getGraphicsContext2D();
@@ -93,7 +92,30 @@ public class InterfaceController implements Initializable {
     }
 
     @FXML
-    public void btnProcessarAction() {}
+    public void btnProcessarAction() {
+
+        TrabalhadoraSegmentacao trabalhadoraSegmentacao = new TrabalhadoraSegmentacao(pontosDesenhados, imagem);
+
+        trabalhadoraSegmentacao.setOnSucceeded(Event -> {
+
+            try {
+                
+                Imagem img = trabalhadoraSegmentacao.get();
+                inicializarCanvas(img.getImagemBytes());
+
+
+            } catch (InterruptedException | ExecutionException e) {
+                
+                e.printStackTrace();
+            }
+
+        });
+
+
+        Thread thread = new Thread(trabalhadoraSegmentacao);
+        thread.setDaemon(true);
+        thread.start();
+    }
 
     @FXML
     public void onMouseDragged(MouseEvent event) {
