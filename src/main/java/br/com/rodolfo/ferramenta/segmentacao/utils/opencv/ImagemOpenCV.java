@@ -1,14 +1,18 @@
 package br.com.rodolfo.ferramenta.segmentacao.utils.opencv;
 
+import java.awt.Point;
 import java.io.ByteArrayInputStream;
+import java.util.Set;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
+import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_imgcodecs;
 import org.bytedeco.javacpp.opencv_imgproc;
 import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.bytedeco.javacpp.opencv_core.Size;
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
 import org.bytedeco.javacpp.indexer.IntRawIndexer;
@@ -82,6 +86,7 @@ public class ImagemOpenCV {
         dados.append("Tipo da imagem : ").append("\t").append(img.type());
         dados.append(System.lineSeparator());
         dados.append("Qtd canais da imagem : ").append("\t").append(img.channels());
+        dados.append(System.lineSeparator());
         dados.append(System.lineSeparator());
 
         if(profundidade <= 1) {
@@ -189,6 +194,32 @@ public class ImagemOpenCV {
         opencv_imgproc.resize(img, dst, new Size(largura, altura), 0, 0, opencv_imgproc.INTER_CUBIC);
 
         return dst;
+    }
+
+    /**
+     * Cria uma imagem de contornos a partir de uma conjunto (Set<Point>) de pontos.
+     * 
+     * @param size
+     * @param pontosDesenhados
+     * @return imagem de contornos
+     */
+    public static Mat desenharContornos(Size size, Set<Point> pontosDesenhados) {
+
+        Mat imagem = Mat.ones(size, opencv_core.CV_8UC1).asMat();
+
+        UByteRawIndexer indice = imagem.createIndexer();
+
+        for(Point ponto : pontosDesenhados) {
+
+            int row = ponto.y;
+            int col = ponto.x;
+
+            indice.put(row, col, 0);
+        }
+
+        indice.release();
+
+        return imagem;
     }
 
 }
