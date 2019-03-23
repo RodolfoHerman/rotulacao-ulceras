@@ -30,14 +30,17 @@ public class EstruturaOpenCV {
     public static Mat preenchimentoContornos(Mat imagem, int dimensao) {
 
         Mat dst = new Mat();
-        Mat resposta = Mat.ones(imagem.size(), imagem.type()).asMat();
+        Mat resposta = new  Mat(imagem.size(), imagem.type(), Scalar.WHITE);
         Mat elemEstruturante = opencv_imgproc.getStructuringElement(MORPH_CROSS, new Size(dimensao, dimensao));
         MatVector contornos = new MatVector();
 
         opencv_imgproc.dilate(imagem, dst, elemEstruturante);
         opencv_imgproc.findContours(dst, contornos, new Mat(), RETR_TREE, CHAIN_APPROX_SIMPLE);
 
-        opencv_imgproc.fillPoly(resposta, contornos, Scalar.BLACK);
+        for(Mat contorno : contornos.get()) {
+
+            opencv_imgproc.fillPoly(resposta, new MatVector(contorno), Scalar.BLACK);
+        }
 
         return resposta;
     }

@@ -1,19 +1,19 @@
 package br.com.rodolfo.ferramenta.segmentacao.utils.opencv;
 
-import java.awt.Point;
 import java.io.ByteArrayInputStream;
-import java.util.Set;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_imgcodecs;
-import org.bytedeco.javacpp.opencv_imgproc;
 import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.Point;
 import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.bytedeco.javacpp.opencv_core.Size;
+import org.bytedeco.javacpp.opencv_imgcodecs;
+import org.bytedeco.javacpp.opencv_imgproc;
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
 import org.bytedeco.javacpp.indexer.IntRawIndexer;
 import org.bytedeco.javacpp.indexer.UByteRawIndexer;
@@ -203,21 +203,19 @@ public class ImagemOpenCV {
      * @param pontosDesenhados
      * @return imagem de contornos
      */
-    public static Mat desenharContornos(Size size, Set<Point> pontosDesenhados) {
+    public static Mat desenharContornos(Size size, List<List<Point>> pontosDesenhados) {
 
-        Mat imagem = Mat.ones(size, opencv_core.CV_8UC1).asMat();
+        Mat imagem = new Mat(size, opencv_core.CV_8UC1, Scalar.BLACK);
 
-        UByteRawIndexer indice = imagem.createIndexer();
+        for(List<Point> lista : pontosDesenhados) {
 
-        for(Point ponto : pontosDesenhados) {
-
-            int row = ponto.y;
-            int col = ponto.x;
-
-            indice.put(row, col, 0);
+            for (int atual = 0, next = 1; next != 0; atual++) {
+                next = (atual + 1) % lista.size();
+                Point ini = lista.get(atual);
+                Point fim = lista.get(next);
+                opencv_imgproc.line(imagem, ini, fim, Scalar.WHITE);
+            }
         }
-
-        indice.release();
 
         return imagem;
     }

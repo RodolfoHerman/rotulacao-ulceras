@@ -1,12 +1,12 @@
 package br.com.rodolfo.ferramenta.segmentacao.controllers;
 
-import java.awt.Point;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.URL;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import br.com.rodolfo.ferramenta.segmentacao.MainApp;
@@ -30,6 +30,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+
+import org.bytedeco.javacpp.opencv_core.Point;
 
 public class InterfaceController implements Initializable {
 
@@ -79,7 +81,8 @@ public class InterfaceController implements Initializable {
     private Point mousePressionado;
     private int mousePressionadoPrevX;
     private int mousePressionadoPrevY;
-    private Set<Point> pontosDesenhados;
+    private List<List<Point>> pontosDesenhados;
+    private int qtdClicks;
     private final Color cor = Color.rgb(255, 80, 75);
 
     @Override
@@ -88,7 +91,7 @@ public class InterfaceController implements Initializable {
         graphicCanvasFG = canvasFG.getGraphicsContext2D();
         graphicCanvasBG = canvasBG.getGraphicsContext2D();
 
-        pontosDesenhados = new HashSet<>();
+        pontosDesenhados = new ArrayList<>();
     }
 
     @FXML
@@ -132,11 +135,13 @@ public class InterfaceController implements Initializable {
         mousePressionadoPrevX = x;
         mousePressionadoPrevY = y;
 
-        pontosDesenhados.add(new Point(x,y));
+        pontosDesenhados.get(qtdClicks).add(new Point(x,y));
     }
 
     @FXML
     public void onMousePressed(MouseEvent event) {
+
+        qtdClicks++;
 
         scrollController.stopScroll();
         
@@ -148,7 +153,7 @@ public class InterfaceController implements Initializable {
 
         mousePressionado = new Point(x,y);
 
-        pontosDesenhados.add(mousePressionado);
+        pontosDesenhados.add(new ArrayList<>(Arrays.asList(mousePressionado)));
     }
 
     @FXML
@@ -168,7 +173,7 @@ public class InterfaceController implements Initializable {
 
             caminho = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf("\\"));
             txtCampoDiretorio.setText(file.getAbsolutePath());
-            imagem = imagemService.abrirImagem(2048, 2048, file.getAbsolutePath());
+            imagem = imagemService.abrirImagem(512, 512, file.getAbsolutePath());
 
             resetar();
             inicializarCanvas(imagem.getImagemBytes());
@@ -232,6 +237,7 @@ public class InterfaceController implements Initializable {
         pontosDesenhados.clear();
         scrollPane.setVvalue(0);
         scrollPane.setHvalue(0);
+        qtdClicks = -1;
     }
 
 }

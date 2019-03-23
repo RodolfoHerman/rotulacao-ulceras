@@ -1,7 +1,8 @@
 package br.com.rodolfo.ferramenta.segmentacao.process;
 
-import java.awt.Point;
-import java.util.Set;
+import java.util.List;
+
+import org.bytedeco.javacpp.opencv_core.Point;
 
 import br.com.rodolfo.ferramenta.segmentacao.models.Imagem;
 import javafx.concurrent.Task;
@@ -11,10 +12,10 @@ import javafx.concurrent.Task;
  */
 public class TrabalhadoraSegmentacao extends Task<Imagem>{
 
-    private final Set<Point> pontosDesenhados;
+    private final List<List<Point>> pontosDesenhados;
     private final Imagem imagem;
 
-    public TrabalhadoraSegmentacao(Set<Point> pontosDesenhados, Imagem imagem) {
+    public TrabalhadoraSegmentacao(List<List<Point>> pontosDesenhados, Imagem imagem) {
 
         this.pontosDesenhados = pontosDesenhados;
         this.imagem = imagem;
@@ -27,8 +28,6 @@ public class TrabalhadoraSegmentacao extends Task<Imagem>{
         int[] progresso  = {0, 1, 2, 3, 4};
         int maxProgresso = progresso.length;
         int andamento    = 0;
-
-
         
         return null;
     }
