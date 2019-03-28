@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 
@@ -103,9 +104,10 @@ public class InterfaceController implements Initializable {
 
             try {
                 
-                Imagem img = trabalhadoraSegmentacao.get();
-                inicializarCanvas(img.getImagemBytes());
-
+                Optional<Imagem> img = trabalhadoraSegmentacao.get();
+                img.ifPresentOrElse(
+                    processada -> inicializarCanvas(processada.getImagemBytes()), 
+                    () -> System.out.println("Imagem não foi processada"));
 
             } catch (InterruptedException | ExecutionException e) {
                 

@@ -1,6 +1,7 @@
 package br.com.rodolfo.ferramenta.segmentacao.process;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.bytedeco.javacpp.opencv_core.Point;
 
@@ -10,7 +11,7 @@ import javafx.concurrent.Task;
 /**
  * TrabalhadoraSegmentacao
  */
-public class TrabalhadoraSegmentacao extends Task<Imagem>{
+public class TrabalhadoraSegmentacao extends Task<Optional<Imagem>>{
 
     private final List<List<Point>> pontosDesenhados;
     private final Imagem imagem;
@@ -23,13 +24,13 @@ public class TrabalhadoraSegmentacao extends Task<Imagem>{
 
 
     @Override
-    protected Imagem call() throws Exception {
+    protected Optional<Imagem> call() throws Exception {
         
         int[] progresso  = {0, 1, 2, 3, 4};
         int maxProgresso = progresso.length;
         int andamento    = 0;
         
-        return null;
+        return Optional.empty();
     }
 
     

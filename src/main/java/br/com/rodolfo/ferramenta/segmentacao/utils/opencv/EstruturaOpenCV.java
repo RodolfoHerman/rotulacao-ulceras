@@ -124,16 +124,31 @@ public class EstruturaOpenCV {
     public static Mat preenchimentoContornos(Mat imagem, int dimensao) {
 
         Mat resposta = new  Mat(imagem.size(), imagem.type(), Scalar.BLACK);
-        MatVector contornos = new MatVector();
 
-        opencv_imgproc.findContours(dilatacao(imagem, dimensao), contornos, new Mat(), RETR_TREE, CHAIN_APPROX_SIMPLE);
+        Mat[] contornos = encontrarContornos(imagem, dimensao);
 
-        for(Mat contorno : contornos.get()) {
+        for(Mat contorno : contornos) {
 
             opencv_imgproc.fillPoly(resposta, new MatVector(contorno), Scalar.WHITE);
         }
 
         return resposta;
+    }
+
+    /**
+     * Encontra todos os contornos de figuras existentes na imagem
+     * 
+     * @param imagem
+     * @param dimensao
+     * @return Mat[]
+     */
+    public static Mat[] encontrarContornos(Mat imagem, int dimensao) {
+        
+        MatVector contornos = new MatVector();
+
+        opencv_imgproc.findContours(dilatacao(imagem, dimensao), contornos, new Mat(), RETR_TREE, CHAIN_APPROX_SIMPLE);
+
+        return contornos.get();
     }
 
     /**
