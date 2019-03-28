@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Point;
+import org.bytedeco.javacpp.opencv_core.Rect;
 import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.bytedeco.javacpp.opencv_core.Size;
 import org.bytedeco.javacpp.opencv_imgcodecs;
@@ -218,6 +219,42 @@ public class ImagemOpenCV {
         }
 
         return imagem;
+    }
+
+    /**
+     * Executa a segmentação pelo método grabCut
+     * 
+     * @param imagem
+     * @param mascara
+     * @return imagem segmentada
+     */
+    public static Mat executarGrabCut(Mat imagem, Mat mascara) {
+        
+        Mat bgdModel = new Mat();
+        Mat fgdModel = new Mat();
+        Rect rect    = new Rect();
+
+        Mat clone = mascara.clone();
+
+        Mat aux1 = new Mat(mascara.size(), opencv_core.CV_8UC1);
+        Mat aux2 = new Mat(mascara.size(), opencv_core.CV_8UC1);
+
+        Mat comparador1 = new Mat(1, 1, opencv_core.CV_8U, new Scalar(3.0));
+        Mat comparador2 = new Mat(1, 1, opencv_core.CV_8U, new Scalar(1.0));
+
+        int iterCount = 5;
+        
+        opencv_imgproc.grabCut(imagem, clone, rect, bgdModel, fgdModel, iterCount, opencv_imgproc.GC_INIT_WITH_MASK); 
+
+        opencv_core.compare(clone, comparador1, aux1, opencv_core.CMP_EQ); 
+        opencv_core.compare(clone, comparador2, aux2, opencv_core.CMP_EQ); 
+        
+        Mat foreground = new Mat(imagem.size(), imagem.type(), Scalar.WHITE);
+        
+        imagem.copyTo(foreground, aux1);
+        imagem.copyTo(foreground, aux2);
+
+        return foreground;
     }
 
 }
