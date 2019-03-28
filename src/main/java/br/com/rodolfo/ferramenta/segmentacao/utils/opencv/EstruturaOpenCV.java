@@ -4,6 +4,11 @@ import static org.bytedeco.javacpp.opencv_imgproc.CHAIN_APPROX_SIMPLE;
 import static org.bytedeco.javacpp.opencv_imgproc.MORPH_CROSS;
 import static org.bytedeco.javacpp.opencv_imgproc.RETR_TREE;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.MatVector;
@@ -121,34 +126,94 @@ public class EstruturaOpenCV {
      * @param dimensao
      * @return imagem preenchida
      */
-    public static Mat preenchimentoContornos(Mat imagem, int dimensao) {
+    public static Mat preencherContornos(Mat imagem, int dimensao) {
 
         Mat resposta = new  Mat(imagem.size(), imagem.type(), Scalar.BLACK);
 
-        Mat[] contornos = encontrarContornos(imagem, dimensao);
-
-        for(Mat contorno : contornos) {
-
-            opencv_imgproc.fillPoly(resposta, new MatVector(contorno), Scalar.WHITE);
-        }
+        encontrarContornos(imagem, dimensao)
+            .stream()
+            .forEach(img -> opencv_imgproc.fillPoly(resposta, new MatVector(img), Scalar.WHITE));
 
         return resposta;
     }
 
     /**
-     * Encontra todos os contornos de figuras existentes na imagem
+     * Realiza o preenchimento do contorno em uma imagem previamente criada
+     * 
+     * @param imagem
+     * @param contorno
+     * @param corPreenchimento
+     * @param corFundo
+     * @return imagem contorno
+     */
+    public static Mat preencherContorno(Mat imagem, Mat contorno, Scalar corPreenchimento) {
+        
+        Mat resposta = imagem.clone();
+        opencv_imgproc.fillPoly(resposta, new MatVector(contorno), corPreenchimento);
+
+        return resposta;
+    }
+
+    /**
+     * Realiza o preenchimento do contorno em uma imagem nova com as cores especificadas
+     * 
+     * @param size
+     * @param contorno
+     * @param corPreenchimento
+     * @param corFundo
+     * @return imagem contorno
+     */
+    public static Mat preencherContorno(Size size, Mat contorno, Scalar corPreenchimento, Scalar corFundo) {
+        
+        Mat resposta = new Mat(size, opencv_core.CV_8U, corFundo);
+        opencv_imgproc.fillPoly(resposta, new MatVector(contorno), corPreenchimento);
+
+        return resposta;
+    }
+
+    /**
+     * Realiza o preenchimento com a cor desejada na imagem1 de acordo com a figura da imagem2 e o comparador da figura.
+     * Imagem necessariamente tem que ser opencv_core.CV_8U
+     * 
+     * @param imagem1
+     * @param imagem2
+     * @param corPreenchimento
+     * @param comparador
+     */
+    public static void preencherContorno(Mat imagem1, Mat imagem2, int corPreenchimento, int comparador) {
+        
+        UByteRawIndexer indice1 = imagem1.createIndexer();
+        UByteRawIndexer indice2 = imagem2.createIndexer();
+
+        for(int row = 0; row < imagem1.rows(); row++) {
+            for(int col = 0; col < imagem1.cols(); col++) {
+
+                if(indice2.get(row, col) == comparador) {
+
+                    indice1.put(row, col, corPreenchimento);
+                }
+            }
+        }
+
+        indice1.release();
+        indice2.release();
+    }
+
+    /**
+     * Encontra todos os contornos de figuras existentes na imagem. O parâmetro 'dimensao'
+     * é o tamanho do elemento estruturante, ex.: dimensao = 3 -> 3x3
      * 
      * @param imagem
      * @param dimensao
-     * @return Mat[]
+     * @return Lista de Mat
      */
-    public static Mat[] encontrarContornos(Mat imagem, int dimensao) {
+    public static List<Mat> encontrarContornos(Mat imagem, int dimensao) {
         
         MatVector contornos = new MatVector();
 
         opencv_imgproc.findContours(dilatacao(imagem, dimensao), contornos, new Mat(), RETR_TREE, CHAIN_APPROX_SIMPLE);
 
-        return contornos.get();
+        return Arrays.asList(contornos.get());
     }
 
     /**
@@ -183,6 +248,41 @@ public class EstruturaOpenCV {
         opencv_imgproc.dilate(imagem, dst, elemEstruturante);
 
         return dst;
+    }
+
+
+    /**
+     * Cria a máscara de entrada para o método GrabCut realizar a segmentação. 
+     * O parâmetro 'dimensao' é o tamanho do elemento estruturante, ex.: dimensao = 3 -> 3x3.
+     * O parâmetro 'area' é a porcentagem da área que se deseja manter ao fazer a erosão da área original.
+     * 
+     * @param imagemBinaria
+     * @param dimensao
+     * @param area
+     * @return máscara
+     */
+    public static Mat criarMascaraGrabCut(Mat imagemBinaria, int dimensao, double area) {
+
+        Mat mascara = new Mat(imagemBinaria.size(), opencv_core.CV_8U, new Scalar(Integer.valueOf(opencv_imgproc.GC_BGD).doubleValue()));
+        Size size = imagemBinaria.size();
+        
+        encontrarContornos(imagemBinaria, dimensao)
+            .stream()
+            .filter(contorno -> opencv_imgproc.contourArea(contorno) >= 30)
+            .forEach(contorno -> {
+
+                //Criar contorno preenchido para o algoritmo do esqueleto
+                Mat temp = preencherContorno(size, contorno, Scalar.WHITE, Scalar.BLACK);
+                Mat esqu = esqueleto(temp, area);
+
+                //Criar máscara parcial a partir do contorno
+                Mat parc = preencherContorno(size, contorno, new Scalar(Double.valueOf(opencv_imgproc.GC_PR_FGD)), new Scalar(Double.valueOf(opencv_imgproc.GC_BGD)));
+                preencherContorno(parc, esqu, opencv_imgproc.GC_FGD, 255);
+
+                opencv_core.add(mascara, parc, mascara);
+            });
+
+        return mascara;
     }
     
 }

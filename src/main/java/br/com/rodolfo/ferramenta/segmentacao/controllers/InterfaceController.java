@@ -100,6 +100,8 @@ public class InterfaceController implements Initializable {
 
         TrabalhadoraSegmentacao trabalhadoraSegmentacao = new TrabalhadoraSegmentacao(pontosDesenhados, imagem);
 
+        System.out.println("Processando !!");
+
         trabalhadoraSegmentacao.setOnSucceeded(Event -> {
 
             try {
@@ -175,7 +177,7 @@ public class InterfaceController implements Initializable {
 
             caminho = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf("\\"));
             txtCampoDiretorio.setText(file.getAbsolutePath());
-            imagem = imagemService.abrirImagem(512, 512, file.getAbsolutePath());
+            imagem = imagemService.abrirImagem(800, 600, file.getAbsolutePath());
 
             resetar();
             inicializarCanvas(imagem.getImagemBytes());

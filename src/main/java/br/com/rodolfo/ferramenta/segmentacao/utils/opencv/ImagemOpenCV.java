@@ -208,7 +208,7 @@ public class ImagemOpenCV {
 
         Mat imagem = new Mat(size, opencv_core.CV_8UC1, Scalar.BLACK);
 
-        for(List<Point> lista : pontosDesenhados) {
+        pontosDesenhados.stream().forEach(lista -> {
 
             for (int atual = 0, next = 1; next != 0; atual++) {
                 next = (atual + 1) % lista.size();
@@ -216,7 +216,8 @@ public class ImagemOpenCV {
                 Point fim = lista.get(next);
                 opencv_imgproc.line(imagem, ini, fim, Scalar.WHITE);
             }
-        }
+
+        });
 
         return imagem;
     }
@@ -255,6 +256,50 @@ public class ImagemOpenCV {
         imagem.copyTo(foreground, aux2);
 
         return foreground;
+    }
+
+    /**
+     * Cria a máscara colorida do GrabCut para humanos enxergar
+     * 
+     * @param mascara
+     * @return mascara
+     */
+    public static Mat criarMascaraGrabCutVisual(Mat mascara) {
+        
+        Mat resp = new Mat(mascara.size(), opencv_core.CV_8UC3, Scalar.WHITE);
+
+        UByteRawIndexer indResp = resp.createIndexer();
+        UByteRawIndexer indGrab = mascara.createIndexer();
+
+        int[] ulcera    = {0, 165, 255};
+        int[] provavel  = {52, 80, 255};
+        int[] naoUlcera = {255, 144, 30};    
+
+        for(int row = 0; row < mascara.rows(); row++) {
+            for(int col = 0; col < mascara.cols(); col++) {
+
+                if(indGrab.get(row, col) == opencv_imgproc.GC_PR_FGD) {
+
+                    indResp.put(row, col, provavel);
+                }
+
+                if(indGrab.get(row, col) == opencv_imgproc.GC_FGD) {
+
+                    indResp.put(row, col, ulcera);
+                }
+
+                if(indGrab.get(row, col) == opencv_imgproc.GC_BGD) {
+
+                    indResp.put(row, col, naoUlcera);
+                }
+
+            }
+        }
+
+        indResp.release();
+        indGrab.release();
+
+        return resp;
     }
 
 }
