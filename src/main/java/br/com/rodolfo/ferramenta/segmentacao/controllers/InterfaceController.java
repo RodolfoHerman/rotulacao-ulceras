@@ -2,15 +2,19 @@ package br.com.rodolfo.ferramenta.segmentacao.controllers;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 
 import br.com.rodolfo.ferramenta.segmentacao.MainApp;
+import br.com.rodolfo.ferramenta.segmentacao.config.Configuracao;
 import br.com.rodolfo.ferramenta.segmentacao.models.Imagem;
 import br.com.rodolfo.ferramenta.segmentacao.process.TrabalhadoraSegmentacao;
 import br.com.rodolfo.ferramenta.segmentacao.services.ImagemService;
@@ -86,6 +90,9 @@ public class InterfaceController implements Initializable {
     private int qtdClicks;
     private final Color cor = Color.rgb(255, 80, 75);
 
+    private static final String PROPERTIES = "config.properties"; 
+    private Configuracao configuracao;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
@@ -93,14 +100,42 @@ public class InterfaceController implements Initializable {
         graphicCanvasBG = canvasBG.getGraphicsContext2D();
 
         pontosDesenhados = new ArrayList<>();
+
+        this.configuracao = new Configuracao();
+        Properties prop = new Properties();
+        
+        try(InputStream input = InterfaceController.class.getClassLoader().getResourceAsStream(PROPERTIES)) {
+            
+            prop.load(input);
+
+            this.configuracao.superpixelIteracoes = Integer.valueOf(prop.getProperty("superpixel.iteracoes"));
+            this.configuracao.superpixelTamanho   = Integer.valueOf(prop.getProperty("superpixel.tamanho"));
+            this.configuracao.superpixelRegra     = Integer.valueOf(prop.getProperty("superpixel.regra"));
+            this.configuracao.superpixelTaxa      = Float.valueOf(prop.getProperty("superpixel.taxa"));
+            
+            this.configuracao.morfologiaDimensaoKernel = Integer.valueOf(prop.getProperty("morfologia.dimensao.kernel"));
+            
+            this.configuracao.grabcutAreaMinima      = Integer.valueOf(prop.getProperty("grabcut.area.minima"));
+            this.configuracao.grabcutAreaEsqueleto   = Double.valueOf(prop.getProperty("grabcut.area.esqueleto"));
+            this.configuracao.grabcutEsqueletoKernel = Integer.valueOf(prop.getProperty("grabcut.esqueleto.kernel"));
+            
+            this.configuracao.amostragemAltura  = Integer.valueOf(prop.getProperty("amostragem.altura"));
+            this.configuracao.amostragemLargura = Integer.valueOf(prop.getProperty("amostragem.largura"));
+
+        } catch(IOException e) {
+
+            System.err.println(e);
+        }
+
     }
 
     @FXML
     public void btnProcessarAction() {
 
-        TrabalhadoraSegmentacao trabalhadoraSegmentacao = new TrabalhadoraSegmentacao(pontosDesenhados, imagem);
+        TrabalhadoraSegmentacao trabalhadoraSegmentacao = new TrabalhadoraSegmentacao(pontosDesenhados, imagem, configuracao);
 
-        System.out.println("Processando !!");
+        resetarProgresso();
+        this.barraProgresso.progressProperty().bind(trabalhadoraSegmentacao.progressProperty());
 
         trabalhadoraSegmentacao.setOnSucceeded(Event -> {
 
@@ -108,7 +143,10 @@ public class InterfaceController implements Initializable {
                 
                 Optional<Imagem> img = trabalhadoraSegmentacao.get();
                 img.ifPresentOrElse(
-                    processada -> inicializarCanvas(processada.getImagemBytes()), 
+                    processada -> {
+                        inserirImagemProcessadaCanvas(processada.getImagemContornoBytes());
+                        resetarProgresso();
+                    }, 
                     () -> System.out.println("Imagem não foi processada"));
 
             } catch (InterruptedException | ExecutionException e) {
@@ -177,7 +215,7 @@ public class InterfaceController implements Initializable {
 
             caminho = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf("\\"));
             txtCampoDiretorio.setText(file.getAbsolutePath());
-            imagem = imagemService.abrirImagem(800, 600, file.getAbsolutePath());
+            imagem = imagemService.abrirImagem(this.configuracao.amostragemLargura, this.configuracao.amostragemAltura, file.getAbsolutePath());
 
             resetar();
             inicializarCanvas(imagem.getImagemBytes());
@@ -218,6 +256,19 @@ public class InterfaceController implements Initializable {
         return fileChooser;
     }
 
+    private void inserirImagemProcessadaCanvas(ByteArrayInputStream arrayInputStream) {
+
+        Image image = new Image(arrayInputStream);
+
+        graphicCanvasBG.clearRect(0, 0, image.getWidth(), image.getHeight());
+        canvasBG.setWidth(imagem.getCols());
+        canvasBG.setHeight(imagem.getRows());
+
+        graphicCanvasBG.drawImage(image, 0, 0);
+
+        canvasFG.toFront();
+    }
+
     private void inicializarCanvas(ByteArrayInputStream arrayInputStream) {
         
         Image image = new Image(arrayInputStream);
@@ -242,6 +293,12 @@ public class InterfaceController implements Initializable {
         scrollPane.setVvalue(0);
         scrollPane.setHvalue(0);
         qtdClicks = -1;
+    }
+
+    private void resetarProgresso() {
+
+        this.barraProgresso.progressProperty().unbind();
+        this.barraProgresso.setProgress(0.0);
     }
 
 }

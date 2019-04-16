@@ -3,13 +3,11 @@ package br.com.rodolfo.ferramenta.segmentacao.process;
 import java.util.List;
 import java.util.Optional;
 
-import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Point;
-import org.bytedeco.javacpp.opencv_core.Scalar;
-import org.bytedeco.javacpp.opencv_ximgproc.SuperpixelLSC;
 import org.bytedeco.javacpp.opencv_ximgproc.SuperpixelSLIC;
 
+import br.com.rodolfo.ferramenta.segmentacao.config.Configuracao;
 import br.com.rodolfo.ferramenta.segmentacao.models.Imagem;
 import br.com.rodolfo.ferramenta.segmentacao.utils.opencv.EstruturaOpenCV;
 import br.com.rodolfo.ferramenta.segmentacao.utils.opencv.ImagemOpenCV;
@@ -22,42 +20,50 @@ public class TrabalhadoraSegmentacao extends Task<Optional<Imagem>>{
 
     private final List<List<Point>> pontosDesenhados;
     private final Imagem imagem;
+    private final Configuracao configuracao;
 
-    public TrabalhadoraSegmentacao(List<List<Point>> pontosDesenhados, Imagem imagem) {
+    public TrabalhadoraSegmentacao(List<List<Point>> pontosDesenhados, Imagem imagem, Configuracao configuracao) {
 
         this.pontosDesenhados = pontosDesenhados;
         this.imagem = imagem;
+        this.configuracao = configuracao;
     }
 
 
     @Override
     protected Optional<Imagem> call() throws Exception {
         
-        int[] progresso  = {0, 1, 2, 3, 4};
+        int[] progresso  = {1, 2, 3, 4, 5, 6};
         int maxProgresso = progresso.length;
         int andamento    = 0;
 
-        Mat contornos = ImagemOpenCV.desenharContornos(imagem.getImagem().size(), pontosDesenhados);
-        Mat contornoP = EstruturaOpenCV.preencherContornos(contornos, 3);
-        Mat mascarGrab = EstruturaOpenCV.criarMascaraGrabCut(contornoP, 3, 0.65);
-
-        ImagemOpenCV.mostrar(ImagemOpenCV.criarMascaraGrabCutVisual(mascarGrab));
-
-        Mat seg = ImagemOpenCV.executarGrabCut(imagem.getImagem(), mascarGrab);
-
-        Mat cont = new Mat();
-        Mat labels = new Mat();
-        SuperpixelSLIC slic = ImagemOpenCV.segmentarSuperpixelSLIC(seg, 400, 40, 25);
-        slic.getLabels(labels);
-        slic.getLabelContourMask(cont);
-
-        Mat nova = ImagemOpenCV.desenharContornosSuperpixels(imagem.getImagem(), cont);
-
-        ImagemOpenCV.mostrar(labels);
-        ImagemOpenCV.mostrar(nova);
-
+        Mat contornosDesenho = ImagemOpenCV.desenharContornos(imagem.getImagem().size(), pontosDesenhados);
+        updateProgress(progresso[andamento++], maxProgresso);
         
-        return Optional.empty();
+        Mat contornosPreenchidos = EstruturaOpenCV.preencherContornos(contornosDesenho, configuracao.morfologiaDimensaoKernel);
+        updateProgress(progresso[andamento++], maxProgresso);
+        
+        Mat mascarGrab = EstruturaOpenCV.criarMascaraGrabCut(contornosPreenchidos, configuracao.grabcutEsqueletoKernel,configuracao.grabcutAreaEsqueleto);
+        updateProgress(progresso[andamento++], maxProgresso);
+        
+        Mat segmentacao = ImagemOpenCV.executarGrabCut(imagem.getImagem(), mascarGrab);
+        updateProgress(progresso[andamento++], maxProgresso);
+        
+        SuperpixelSLIC slic = ImagemOpenCV.segmentarSuperpixelSLIC(segmentacao, configuracao.superpixelIteracoes, configuracao.superpixelTamanho, configuracao.superpixelRegra);
+        updateProgress(progresso[andamento++], maxProgresso);
+        
+        Mat contornos = new Mat();
+        Mat labels    = new Mat();
+        slic.getLabels(labels);
+        slic.getLabelContourMask(contornos);
+        
+        this.imagem.setSuperpixelLabes(labels);
+        this.imagem.setSuperpixelContornos(ImagemOpenCV.desenharContornosSuperpixels(imagem.getImagem(), contornos));
+        updateProgress(maxProgresso, maxProgresso);
+
+        Thread.sleep(1000);
+        
+        return Optional.of(this.imagem);
     }
 
     

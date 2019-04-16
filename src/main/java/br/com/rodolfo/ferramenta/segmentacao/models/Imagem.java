@@ -15,6 +15,7 @@ public class Imagem {
 
     private String nome;
     private Mat superpixelLabels;
+    private Mat superpixelContornos;
     private Map<Integer,Superpixel> superpixels = new HashMap<>();
     final private Mat imagem;
 
@@ -43,6 +44,16 @@ public class Imagem {
         this.superpixelLabels = superpixelLabels;
     }
 
+    public Mat getSuperpixelContornos() {
+
+        return this.superpixelContornos;
+    }
+
+    public void setSuperpixelContornos(Mat superpixelContornos) {
+
+        this.superpixelContornos = superpixelContornos;
+    }
+
     public Map<Integer,Superpixel> getSuperpixels() {
 
         return this.superpixels;
@@ -68,6 +79,11 @@ public class Imagem {
     public ByteArrayInputStream getImagemBytes() {
 
         return ImagemOpenCV.matParaByteImputStream(this.imagem);
+    }
+
+    public ByteArrayInputStream getImagemContornoBytes() {
+
+        return ImagemOpenCV.matParaByteImputStream(this.superpixelContornos);
     }
     
 }

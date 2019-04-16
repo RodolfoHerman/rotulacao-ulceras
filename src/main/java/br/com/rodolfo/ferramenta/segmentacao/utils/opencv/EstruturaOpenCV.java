@@ -4,10 +4,8 @@ import static org.bytedeco.javacpp.opencv_imgproc.CHAIN_APPROX_SIMPLE;
 import static org.bytedeco.javacpp.opencv_imgproc.MORPH_CROSS;
 import static org.bytedeco.javacpp.opencv_imgproc.RETR_TREE;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
@@ -276,11 +274,15 @@ public class EstruturaOpenCV {
                 Mat esqu = esqueleto(temp, area);
 
                 //Criar máscara parcial a partir do contorno
-                Mat parc = preencherContorno(size, contorno, new Scalar(Double.valueOf(opencv_imgproc.GC_PR_FGD)), new Scalar(Double.valueOf(opencv_imgproc.GC_BGD)));
+                //Mat parc = preencherContorno(size, contorno, new Scalar(Double.valueOf(opencv_imgproc.GC_PR_FGD)), new Scalar(Double.valueOf(opencv_imgproc.GC_BGD)));
+                Mat parc = new Mat(size, opencv_core.CV_8U, new Scalar(Double.valueOf(opencv_imgproc.GC_BGD)));
+                preencherContorno(parc, temp, opencv_imgproc.GC_PR_FGD, 255);
+                
+                //Criar a máscara para o grabCut
                 preencherContorno(parc, esqu, opencv_imgproc.GC_FGD, 255);
-
                 opencv_core.add(mascara, parc, mascara);
-            });
+            }
+        );
 
         return mascara;
     }
