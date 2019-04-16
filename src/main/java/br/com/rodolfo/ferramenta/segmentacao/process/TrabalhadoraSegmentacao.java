@@ -7,6 +7,7 @@ import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Point;
 import org.bytedeco.javacpp.opencv_core.Scalar;
+import org.bytedeco.javacpp.opencv_ximgproc.SuperpixelLSC;
 
 import br.com.rodolfo.ferramenta.segmentacao.models.Imagem;
 import br.com.rodolfo.ferramenta.segmentacao.utils.opencv.EstruturaOpenCV;
@@ -40,7 +41,17 @@ public class TrabalhadoraSegmentacao extends Task<Optional<Imagem>>{
         Mat mascarGrab = EstruturaOpenCV.criarMascaraGrabCut(contornoP, 3, 0.65);
 
         ImagemOpenCV.mostrar(ImagemOpenCV.criarMascaraGrabCutVisual(mascarGrab));
-        ImagemOpenCV.mostrar(ImagemOpenCV.executarGrabCut(imagem.getImagem(), mascarGrab));
+
+        Mat seg = ImagemOpenCV.executarGrabCut(imagem.getImagem(), mascarGrab);
+
+        Mat cont = new Mat();
+        Mat labels = new Mat();
+        SuperpixelLSC lsc = ImagemOpenCV.segmentarSuperpixelLSC(seg, 400, 50, 0.045f);
+        lsc.getLabels(labels);
+        lsc.getLabelContourMask(imagem.getImagem());
+
+        ImagemOpenCV.mostrar(labels);
+        ImagemOpenCV.mostrar(imagem.getImagem());
 
         
         return Optional.empty();
