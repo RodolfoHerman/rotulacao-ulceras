@@ -47,12 +47,14 @@ public class TrabalhadoraSegmentacao extends Task<Optional<Imagem>>{
 
         Mat cont = new Mat();
         Mat labels = new Mat();
-        SuperpixelSLIC slic = ImagemOpenCV.segmentarSuperpixelSLIC(seg, 400, 50, 20);
+        SuperpixelSLIC slic = ImagemOpenCV.segmentarSuperpixelSLIC(seg, 400, 40, 25);
         slic.getLabels(labels);
-        slic.getLabelContourMask(imagem.getImagem());
+        slic.getLabelContourMask(cont);
+
+        Mat nova = ImagemOpenCV.desenharContornosSuperpixels(imagem.getImagem(), cont);
 
         ImagemOpenCV.mostrar(labels);
-        ImagemOpenCV.mostrar(imagem.getImagem());
+        ImagemOpenCV.mostrar(nova);
 
         
         return Optional.empty();

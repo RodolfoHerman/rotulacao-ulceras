@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.MatVector;
 import org.bytedeco.javacpp.opencv_core.Point;
 import org.bytedeco.javacpp.opencv_core.Rect;
 import org.bytedeco.javacpp.opencv_core.Scalar;
@@ -223,6 +224,43 @@ public class ImagemOpenCV {
         });
 
         return imagem;
+    }
+
+    /**
+     * Aplica os contornos da máscara do método de superpixels na imagem original.
+     * 
+     * @param imagem
+     * @param mascara
+     * @return imagem com contornos
+     */
+    public static Mat desenharContornosSuperpixels(Mat imagem, Mat mascara) {
+
+        Mat clone = imagem.clone();
+        mascara = EstruturaOpenCV.dilatacao(mascara, 3);
+        opencv_core.bitwise_not(mascara, mascara);
+
+        if(imagem.channels() >= 3) {
+
+            MatVector canais = new MatVector();
+
+            opencv_core.split(clone, canais);
+
+            Mat canal0 = canais.get(0);
+            Mat canal1 = canais.get(1);
+            Mat canal2 = canais.get(2);
+            
+            opencv_core.bitwise_and(canal0, mascara, canal0);
+            opencv_core.bitwise_and(canal1, mascara, canal1);
+            opencv_core.bitwise_and(canal2, mascara, canal2);
+            
+            opencv_core.merge(canais, clone);
+
+        } else {
+
+            opencv_core.bitwise_and(clone, mascara, clone);
+        }
+
+        return clone;
     }
 
     /**
