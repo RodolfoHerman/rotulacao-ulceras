@@ -14,6 +14,7 @@ import org.bytedeco.javacpp.opencv_core.Rect;
 import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.bytedeco.javacpp.opencv_core.Size;
 import org.bytedeco.javacpp.opencv_ximgproc.SuperpixelLSC;
+import org.bytedeco.javacpp.opencv_ximgproc.SuperpixelSLIC;
 import org.bytedeco.javacpp.opencv_imgcodecs;
 import org.bytedeco.javacpp.opencv_imgproc;
 import org.bytedeco.javacpp.opencv_ximgproc;
@@ -329,8 +330,40 @@ public class ImagemOpenCV {
         );
 
         lsc.iterate(iteracoes);
+        lsc.enforceLabelConnectivity(tamanho - 1);
 
         return lsc;
+    }
+
+
+    /**
+     * Realiza a segmentação por superpixels através do método LSC. 
+     * O parâmetro iteracoes indica a quantidade de interações necessárias para formar o superpixel
+     * O parâmetro 'tamanho' indica o tamanho aproximado desejado dos superpixels.
+     * O parâmetro 'regra' indica o fator de compactação dos superpixels, quanto menor for
+     * mais as bordas da região se adaptará às curvas com tonalidades diferentes.
+     * 
+     * @param imagem
+     * @param iteracoes
+     * @param tamanho
+     * @param regra
+     * @return
+     */
+    public static SuperpixelSLIC segmentarSuperpixelSLIC(Mat imagem, int iteracoes, int tamanho, int regra) {
+        
+        Mat imagemLab = new Mat();
+
+        opencv_imgproc.medianBlur(imagem, imagemLab, 3);
+        opencv_imgproc.cvtColor(imagemLab, imagemLab, opencv_imgproc.COLOR_BGR2Lab);
+
+        SuperpixelSLIC slic = opencv_ximgproc.createSuperpixelSLIC(
+            imagem, opencv_ximgproc.SLIC, tamanho, regra
+        );
+
+        slic.iterate(iteracoes);
+        slic.enforceLabelConnectivity(tamanho - 1);
+
+        return slic;
     }
 
 }

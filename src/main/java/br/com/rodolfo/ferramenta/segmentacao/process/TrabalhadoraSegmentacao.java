@@ -8,6 +8,7 @@ import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Point;
 import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.bytedeco.javacpp.opencv_ximgproc.SuperpixelLSC;
+import org.bytedeco.javacpp.opencv_ximgproc.SuperpixelSLIC;
 
 import br.com.rodolfo.ferramenta.segmentacao.models.Imagem;
 import br.com.rodolfo.ferramenta.segmentacao.utils.opencv.EstruturaOpenCV;
@@ -46,9 +47,9 @@ public class TrabalhadoraSegmentacao extends Task<Optional<Imagem>>{
 
         Mat cont = new Mat();
         Mat labels = new Mat();
-        SuperpixelLSC lsc = ImagemOpenCV.segmentarSuperpixelLSC(seg, 400, 50, 0.045f);
-        lsc.getLabels(labels);
-        lsc.getLabelContourMask(imagem.getImagem());
+        SuperpixelSLIC slic = ImagemOpenCV.segmentarSuperpixelSLIC(seg, 400, 50, 20);
+        slic.getLabels(labels);
+        slic.getLabelContourMask(imagem.getImagem());
 
         ImagemOpenCV.mostrar(labels);
         ImagemOpenCV.mostrar(imagem.getImagem());
