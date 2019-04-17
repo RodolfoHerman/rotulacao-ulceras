@@ -65,8 +65,8 @@
               <menus>
                 <Menu fx:id="btnMenuArquivo" mnemonicParsing="false" text="Arquivo">
                   <items>
-                        <MenuItem mnemonicParsing="false" onAction="#abrirImagemAction" text="Abrir imagem" />
-                        <MenuItem mnemonicParsing="false" onAction="#salvarProgressoAction" text="Salvar progresso" />
+                        <MenuItem fx:id="btnMenuAbrir" mnemonicParsing="false" onAction="#abrirImagemAction" text="Abrir imagem" />
+                        <MenuItem fx:id="btnMenuSalvar" mnemonicParsing="false" onAction="#salvarProgressoAction" text="Salvar progresso" />
                     <MenuItem mnemonicParsing="false" onAction="#fecharProgramaAction" text="Fechar programa" />
                   </items>
                 </Menu>
@@ -112,7 +112,7 @@
                   </Label>
                   <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="30.0">
                      <children>
-                        <RadioButton fx:id="radioGranulacao" mnemonicParsing="false" styleClass="fonte" stylesheets="@../styles/Styles.css" text="Granulação">
+                        <RadioButton fx:id="radioGranulacao" mnemonicParsing="false" selected="true" styleClass="fonte" stylesheets="@../styles/Styles.css" text="Granulação">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>

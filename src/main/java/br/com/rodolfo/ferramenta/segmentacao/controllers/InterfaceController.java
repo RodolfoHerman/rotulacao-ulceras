@@ -21,10 +21,12 @@ import br.com.rodolfo.ferramenta.segmentacao.services.ImagemService;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
@@ -59,6 +61,12 @@ public class InterfaceController implements Initializable {
     private Menu btnMenuArquivo;
 
     @FXML
+    private MenuItem btnMenuAbrir;
+
+    @FXML
+    private MenuItem btnMenuSalvar;
+
+    @FXML
     private Button btnProcessar;
 
     @FXML
@@ -88,6 +96,7 @@ public class InterfaceController implements Initializable {
     private int mousePressionadoPrevY;
     private List<List<Point>> pontosDesenhados;
     private int qtdClicks;
+    private boolean classificacao;
     private final Color cor = Color.rgb(255, 80, 75);
 
     private static final String PROPERTIES = "config.properties"; 
@@ -98,6 +107,15 @@ public class InterfaceController implements Initializable {
 
         graphicCanvasFG = canvasFG.getGraphicsContext2D();
         graphicCanvasBG = canvasBG.getGraphicsContext2D();
+
+        paneCanvas.setDisable(true);
+        btnProcessar.setDisable(true);
+        btnMenuSalvar.setDisable(true);
+        rotulacaoGrupoRadio.getToggles().forEach(radio -> {
+            
+            Node no = (Node) radio;
+            no.setDisable(true);
+        });
 
         pontosDesenhados = new ArrayList<>();
 
@@ -132,6 +150,9 @@ public class InterfaceController implements Initializable {
     @FXML
     public void btnProcessarAction() {
 
+        paneCanvas.setDisable(true);
+        btnProcessar.setDisable(true);
+        btnMenuAbrir.setDisable(true);
         TrabalhadoraSegmentacao trabalhadoraSegmentacao = new TrabalhadoraSegmentacao(pontosDesenhados, imagem, configuracao);
 
         resetarProgresso();
@@ -146,8 +167,21 @@ public class InterfaceController implements Initializable {
                     processada -> {
                         inserirImagemProcessadaCanvas(processada.getImagemContornoBytes());
                         resetarProgresso();
+
+                        paneCanvas.setDisable(false);
+                        btnMenuAbrir.setDisable(false);
+                        classificacao = true;
+                        rotulacaoGrupoRadio.getToggles().forEach(radio -> {
+            
+                            Node no = (Node) radio;
+                            no.setDisable(false);
+                        });
                     }, 
-                    () -> System.out.println("Imagem não foi processada"));
+                    () -> {
+                        System.out.println("Imagem não foi processada");
+                        paneCanvas.setDisable(false);
+                    }
+                );
 
             } catch (InterruptedException | ExecutionException e) {
                 
@@ -165,37 +199,46 @@ public class InterfaceController implements Initializable {
     @FXML
     public void onMouseDragged(MouseEvent event) {
 
-        scrollController.realizarEventoScroll(event);
+        if(!classificacao) {
+
+            scrollController.realizarEventoScroll(event);
         
-        int x = Double.valueOf(event.getX()).intValue();
-        int y = Double.valueOf(event.getY()).intValue();
-
-        graphicCanvasFG.strokeLine(mousePressionadoPrevX, mousePressionadoPrevY, x, y);
-
-        // x = col
-        // y = row
-        mousePressionadoPrevX = x;
-        mousePressionadoPrevY = y;
-
-        pontosDesenhados.get(qtdClicks).add(new Point(x,y));
+            int x = Double.valueOf(event.getX()).intValue();
+            int y = Double.valueOf(event.getY()).intValue();
+    
+            graphicCanvasFG.strokeLine(mousePressionadoPrevX, mousePressionadoPrevY, x, y);
+    
+            // x = col
+            // y = row
+            mousePressionadoPrevX = x;
+            mousePressionadoPrevY = y;
+    
+            pontosDesenhados.get(qtdClicks).add(new Point(x,y));
+        }
+        
+        
     }
 
     @FXML
     public void onMousePressed(MouseEvent event) {
 
-        qtdClicks++;
+        if(!classificacao) {
 
-        scrollController.stopScroll();
+            qtdClicks++;
+    
+            scrollController.stopScroll();
+            
+            int x = Double.valueOf(event.getX()).intValue();
+            int y = Double.valueOf(event.getY()).intValue();
+    
+            mousePressionadoPrevX = x;
+            mousePressionadoPrevY = y;
+    
+            mousePressionado = new Point(x,y);
+    
+            pontosDesenhados.add(new ArrayList<>(Arrays.asList(mousePressionado)));
+        }
         
-        int x = Double.valueOf(event.getX()).intValue();
-        int y = Double.valueOf(event.getY()).intValue();
-
-        mousePressionadoPrevX = x;
-        mousePressionadoPrevY = y;
-
-        mousePressionado = new Point(x,y);
-
-        pontosDesenhados.add(new ArrayList<>(Arrays.asList(mousePressionado)));
     }
 
     @FXML
@@ -221,6 +264,7 @@ public class InterfaceController implements Initializable {
             inicializarCanvas(imagem.getImagemBytes());
             
             scrollController = new ScrollController(scrollPane, paneCanvas);
+            chooser.setInitialDirectory(new File(caminho));
         }
     }
 
@@ -248,9 +292,6 @@ public class InterfaceController implements Initializable {
             fileChooser.setInitialDirectory(
                 new File(System.getProperty("user.home")));
             fileChooser.setTitle("Abrir Imagem");
-        } else {
-
-            fileChooser.setInitialDirectory(new File(caminho));
         }
 
         return fileChooser;
@@ -285,6 +326,15 @@ public class InterfaceController implements Initializable {
         graphicCanvasBG.drawImage(image, 0, 0);
 
         canvasFG.toFront();
+        paneCanvas.setDisable(false);
+        classificacao = false;
+        btnProcessar.setDisable(false);
+        btnMenuSalvar.setDisable(true);
+        rotulacaoGrupoRadio.getToggles().forEach(radio -> {
+            
+            Node no = (Node) radio;
+            no.setDisable(true);
+        });
     }
 
     private void resetar() {
