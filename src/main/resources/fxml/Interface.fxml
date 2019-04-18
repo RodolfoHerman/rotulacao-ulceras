@@ -130,6 +130,11 @@
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </RadioButton>
+                        <RadioButton mnemonicParsing="false" styleClass="fonte" stylesheets="@../styles/Styles.css" text="Apagar" toggleGroup="$rotulacaoGrupoRadio">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </RadioButton>
                      </children>
                      <padding>
                         <Insets top="10.0" />

@@ -4,15 +4,18 @@ import static org.bytedeco.javacpp.opencv_imgproc.CHAIN_APPROX_SIMPLE;
 import static org.bytedeco.javacpp.opencv_imgproc.MORPH_CROSS;
 import static org.bytedeco.javacpp.opencv_imgproc.RETR_TREE;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.MatVector;
+import org.bytedeco.javacpp.opencv_core.Point;
 import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.bytedeco.javacpp.opencv_core.Size;
 import org.bytedeco.javacpp.opencv_imgproc;
+import org.bytedeco.javacpp.indexer.IntRawIndexer;
 import org.bytedeco.javacpp.indexer.UByteRawIndexer;;
 
 /**
@@ -286,5 +289,54 @@ public class EstruturaOpenCV {
 
         return mascara;
     }
+
+    /**
+     * Abre a imagem de rotulos dos superpixels e retorna o rotulo de acordo com as coordenadas 
+     * 
+     * @param imagem
+     * @param row
+     * @param col
+     * @return rotulo
+     */
+    public static int encontrarRotulo(Mat imagem, int row, int col) {
+        
+        IntRawIndexer indice = imagem.createIndexer();
+
+        int rotulo = indice.get(row, col);
+
+        indice.release();
+
+        return rotulo;
+    }
     
+
+    /**
+     * Encontra as coordenadas do superpixel com o rotulo especifico e retorna a lista de pontos
+     * das coordenadas.
+     * 
+     * @param imagem
+     * @param rotulo
+     * @return lista de coordenadas
+     */
+    public static List<Point> encontrarCoordenadasRotulo(Mat imagem, int rotulo) {
+        
+        List<Point> pontos = new ArrayList<>();
+
+        IntRawIndexer indice = imagem.createIndexer();
+
+        for(int row = 0; row < imagem.rows(); row++) {
+            for(int col = 0; col < imagem.cols(); col++) {
+
+                if(indice.get(row, col) == rotulo) {
+
+                    pontos.add(new Point(col, row));
+                }
+            }
+        }
+
+        indice.release();
+
+        return pontos;
+    }
+
 }

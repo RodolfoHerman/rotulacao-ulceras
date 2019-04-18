@@ -13,15 +13,19 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 
+import org.bytedeco.javacpp.opencv_core.Point;
+
 import br.com.rodolfo.ferramenta.segmentacao.MainApp;
 import br.com.rodolfo.ferramenta.segmentacao.config.Configuracao;
 import br.com.rodolfo.ferramenta.segmentacao.models.Imagem;
+import br.com.rodolfo.ferramenta.segmentacao.models.Superpixel;
+import br.com.rodolfo.ferramenta.segmentacao.models.enums.TecidoTipo;
+import br.com.rodolfo.ferramenta.segmentacao.process.TrabalhadoraRotulacao;
 import br.com.rodolfo.ferramenta.segmentacao.process.TrabalhadoraSegmentacao;
 import br.com.rodolfo.ferramenta.segmentacao.services.ImagemService;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
@@ -37,8 +41,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-
-import org.bytedeco.javacpp.opencv_core.Point;
 
 public class InterfaceController implements Initializable {
 
@@ -97,7 +99,11 @@ public class InterfaceController implements Initializable {
     private List<List<Point>> pontosDesenhados;
     private int qtdClicks;
     private boolean classificacao;
-    private final Color cor = Color.rgb(255, 80, 75);
+    private final Color corContorno = Color.rgb(255, 80, 75);
+    private final Color corGranulacao = Color.rgb(255, 80, 75, 0.4);
+    private final Color corEsfacelo = Color.rgb(255, 165, 0, 0.4);
+    private final Color corEscara = Color.rgb(30, 144, 255, 0.4);
+    private final Color corTransparente = Color.TRANSPARENT;
 
     private static final String PROPERTIES = "config.properties"; 
     private Configuracao configuracao;
@@ -113,7 +119,7 @@ public class InterfaceController implements Initializable {
         btnMenuSalvar.setDisable(true);
         rotulacaoGrupoRadio.getToggles().forEach(radio -> {
             
-            Node no = (Node) radio;
+           RadioButton no = (RadioButton) radio;
             no.setDisable(true);
         });
 
@@ -173,7 +179,7 @@ public class InterfaceController implements Initializable {
                         classificacao = true;
                         rotulacaoGrupoRadio.getToggles().forEach(radio -> {
             
-                            Node no = (Node) radio;
+                            RadioButton no = (RadioButton) radio;
                             no.setDisable(false);
                         });
                     }, 
@@ -222,14 +228,14 @@ public class InterfaceController implements Initializable {
     @FXML
     public void onMousePressed(MouseEvent event) {
 
+        int x = Double.valueOf(event.getX()).intValue();
+        int y = Double.valueOf(event.getY()).intValue();
+        
         if(!classificacao) {
 
             qtdClicks++;
     
             scrollController.stopScroll();
-            
-            int x = Double.valueOf(event.getX()).intValue();
-            int y = Double.valueOf(event.getY()).intValue();
     
             mousePressionadoPrevX = x;
             mousePressionadoPrevY = y;
@@ -237,8 +243,60 @@ public class InterfaceController implements Initializable {
             mousePressionado = new Point(x,y);
     
             pontosDesenhados.add(new ArrayList<>(Arrays.asList(mousePressionado)));
+
+        } else {
+
+            graphicCanvasFG.setLineWidth(1);
+            
+            rotulacaoGrupoRadio.getToggles().filtered(toggle -> toggle.isSelected()).stream().findFirst().ifPresent(radio -> {
+
+                RadioButton no = (RadioButton) radio;
+
+                paneCanvas.setDisable(true);
+                btnProcessar.setDisable(true);
+                btnMenuAbrir.setDisable(true);
+                btnMenuSalvar.setDisable(true);
+                TrabalhadoraRotulacao trabalhadoraRotulacao = new TrabalhadoraRotulacao(y, x, TecidoTipo.toEnum(no.getText()).getCodigo(), imagem.getSuperpixelLabes());
+
+                resetarProgresso();
+                this.barraProgresso.progressProperty().bind(trabalhadoraRotulacao.progressProperty());
+
+                trabalhadoraRotulacao.setOnSucceeded(Event -> {
+
+                    try {
+
+                        Optional<Superpixel> superpixel = trabalhadoraRotulacao.get();
+                        superpixel.ifPresentOrElse(processado -> {
+
+                            colorirCanvasFG(processado.tecidoTipo, processado.coordenadas);
+                            
+                            resetarProgresso();
+
+                            paneCanvas.setDisable(false);
+                            btnMenuAbrir.setDisable(false);
+                            btnMenuSalvar.setDisable(false);
+
+                            imagem.putSuperpixel(processado.rotulo, processado);
+
+
+                        }, () -> {
+
+                            System.out.println("Falha ao processar Superpixel");
+
+                        });
+
+                    } catch (InterruptedException | ExecutionException e) {
+                
+                        e.printStackTrace();
+                    }
+
+                });
+
+                Thread thread = new Thread(trabalhadoraRotulacao);
+                thread.setDaemon(true);
+                thread.start();
+            });
         }
-        
     }
 
     @FXML
@@ -317,8 +375,8 @@ public class InterfaceController implements Initializable {
         graphicCanvasFG.clearRect(0, 0, image.getWidth(), image.getHeight());
         canvasFG.setWidth(imagem.getCols());
         canvasFG.setHeight(imagem.getRows());
-        graphicCanvasFG.setLineWidth(2.0);
-        graphicCanvasFG.setStroke(cor);
+        graphicCanvasFG.setLineWidth(3.0);
+        graphicCanvasFG.setStroke(corContorno);
 
         canvasBG.setWidth(imagem.getCols());
         canvasBG.setHeight(imagem.getRows());
@@ -332,7 +390,7 @@ public class InterfaceController implements Initializable {
         btnMenuSalvar.setDisable(true);
         rotulacaoGrupoRadio.getToggles().forEach(radio -> {
             
-            Node no = (Node) radio;
+           RadioButton no = (RadioButton) radio;
             no.setDisable(true);
         });
     }
@@ -349,6 +407,35 @@ public class InterfaceController implements Initializable {
 
         this.barraProgresso.progressProperty().unbind();
         this.barraProgresso.setProgress(0.0);
+    }
+
+    private void colorirCanvasFG(int tipoTecido, List<Point> pontos) {
+        
+        switch (tipoTecido) {
+            
+            case 0:
+                graphicCanvasFG.setStroke(corTransparente);
+
+            break;
+
+            case 1:
+                graphicCanvasFG.setStroke(corEscara);
+
+            break;
+        
+            case 2:
+                graphicCanvasFG.setStroke(corEsfacelo);
+
+            break;
+
+            case 3:
+                graphicCanvasFG.setStroke(corGranulacao);
+
+            break;
+        }
+
+        pontos.stream().forEach(ponto -> graphicCanvasFG.clearRect(ponto.x(), ponto.y(), 1, 1));
+        pontos.stream().forEach(ponto -> graphicCanvasFG.strokeLine(ponto.x(), ponto.y(), ponto.x(), ponto.y()));
     }
 
 }

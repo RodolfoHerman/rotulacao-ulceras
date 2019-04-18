@@ -4,7 +4,8 @@ public enum TecidoTipo {
 
     ESCARA(1, "Escara"),
     ESFACELO(2, "Esfacelo"),
-    GRANULACAO(3, "Granulacao");
+    GRANULACAO(3, "Granulação"),
+    APAGAR(0, "Apagar");
 
     private Integer codigo;
     private String descricao;
